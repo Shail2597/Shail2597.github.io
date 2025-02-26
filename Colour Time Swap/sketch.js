@@ -8,25 +8,33 @@
 let waitTime = 2000;
 let lastSwitchTime = 0;
 let isWhite = true;
-function setup() {
+function setup() 
+{
   createCanvas(windowWidth, windowHeight);
 }
 
-function draw() {
+function draw() 
+{
   swapStateifNeeded();
   showBackground();
 }
 
-function swapStateifNeeded() {
-  if (millis() > lastSwitchTime + waitTime) {
-    isWhite = !isWhite;
-    lastSwitchTime = millis();
-  }
+function swapStateifNeeded() 
+{
+  if (millis() > lastSwitchTime + waitTime) 
+    {
+      isWhite = !isWhite;
+      lastSwitchTime = millis();
+    }
 }
-function showBackground() {
-  if (isWhite) {
-    background("white");
-  } else {
-    background("black");
-  }
+function showBackground() 
+{
+  if (isWhite) 
+    {
+      background("white");
+    } 
+  else 
+    {
+      background("black");
+    }
 }
