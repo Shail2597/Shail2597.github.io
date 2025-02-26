@@ -22,19 +22,19 @@ function draw()
 function swapStateifNeeded() 
 {
   if (millis() > lastSwitchTime + waitTime) 
-    {
-      isWhite = !isWhite;
-      lastSwitchTime = millis();
-    }
+  {
+    isWhite = !isWhite;
+    lastSwitchTime = millis();
+  }
 }
 function showBackground() 
 {
   if (isWhite) 
-    {
-      background("white");
-    } 
+  {
+    background("white");
+  } 
   else 
-    {
-      background("black");
-    }
+  {
+    background("black");
+  }
 }
