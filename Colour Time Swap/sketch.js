@@ -38,3 +38,7 @@ function showBackground()
     background("black");
   }
 }
+function windowResized()
+{
+  resizeCanvas(windowWidth, windowHeight);
+}

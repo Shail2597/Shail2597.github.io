@@ -1,9 +1,10 @@
-// Project Title
-// Your Name
-// Date
+// Tower of Hanoi
+// Shail Chaudhari
+// 26 February 2025
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - I have used the windowResized function to resize the canvas when the window is resized
+// - I have used the mouseWheel function to move the disks
 
 
 function setup() {
