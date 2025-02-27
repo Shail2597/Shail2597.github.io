@@ -4,15 +4,20 @@
 //
 // Extra for Experts:
 // - I have used the windowResized function to resize the canvas when the window is resized
-// - I have used the mouseWheel function to move the disks
+// - I have used the mouseWheel function to increase the number of disks when the mouse wheel is scrolled UP and DECREASE the number of disks when the mouse wheel is scrolled DOWN
 
 
 let towers = [[],[],[]];
 let numberOfDisks = 5;
-let colors, steps;
+let colors, steps, tower_height, tower_width, tower_x, tower_y;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  windowResized();
+  tower_x = width/4;
+  tower_y = height/3;
+  tower_width = 10;
+  tower_height = tower_y * 3/2;
   initializeTowers();
   generateDiscColors();
 }
@@ -40,8 +45,11 @@ function initializeTowers(){
   steps = 0;
 }
 
-function drawTowers(){
-  let tower_width = width/3 - 50;
-  for (let i = 0; i < 3; i++) {
-    rect((i + 1) * tower_width, height / 3 - 100, 20, 200); // Draw each tower as a rectangle
+function drawTowers(){              
+  for (let i = 1; i < 4; i++) 
+  {
+    stroke(0);
+    fill(255);
+    rect(i * tower_x, tower_y, tower_width, tower_height); // Draw each tower as a rectangle
   }
+}
