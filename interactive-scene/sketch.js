@@ -5,41 +5,52 @@
 // Extra for Experts:
 // - I have used the windowResized function to resize the canvas when the window is resized
 // - I have used the mouseWheel function to increase the number of disks when the mouse wheel is scrolled UP and DECREASE the number of disks when the mouse wheel is scrolled DOWN
+// - I have also used constrain function to limit the number of disks between 1 and 10
 
 
 let towers = [[],[],[]];
 let numberOfDisks = 5;
-let colors, steps, tower_height, tower_width, tower_x, tower_y;
+let colors, steps, tower_height, tower_width, tower_x, tower_y,tower_bottom, idealSteps, discSize;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  windowResized();
   tower_x = width/4;
-  tower_y = height/3;
+  tower_y = height/2;
   tower_width = 10;
-  tower_height = tower_y * 3/2;
+  tower_height = height * 0.55;
+  tower_bottom = tower_y + tower_height/2;
+  discSize = tower_height/15;
   initializeTowers();
   generateDiscColors();
 }
 
+
 function draw() {
   background(220);
   drawTowers();
+  drawDiscs();
+  console.log(numberOfDisks);
+  displayInstructions();
 }
+
+
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
 function generateDiscColors(){
   colors = [];
-  for (let i = 0; i < numberOfDisks; i++){
+  for (let i = 0; i < numberOfDisks; i++)
+  {
     colors.push(color(random(255), random(255), random(255)));
   }
 }
 
 function initializeTowers(){
   towers = [[],[],[]];
-  for (let i = numberOfDisks; i > 0; i--){
+  for (let i = numberOfDisks; i > 0; i--)
+  {
     towers[0].push(i);
   }
   steps = 0;
@@ -50,6 +61,51 @@ function drawTowers(){
   {
     stroke(0);
     fill(255);
+    rectMode(CENTER);
     rect(i * tower_x, tower_y, tower_width, tower_height); // Draw each tower as a rectangle
   }
+}
+
+function drawDiscs(){
+  for (let i = 0; i < 3; i++)
+  {
+    for (let j = 0; j < towers[i].length; j++)
+    {
+      fill(colors[towers[i][j]-1]);
+      stroke(0);
+      rectMode(CENTER);
+      rect((i+1) * tower_x, (tower_y-j*discSize) + (tower_height/2),( discSize * towers[i][j]) ,discSize);
+    }
+  }
+}
+
+function keyPressed(){
+  if (key === 'r' || key === 'R')
+  {
+    initializeTowers();
+    generateDiscColors();
+    numberOfDisks = 5;
+    idealSteps = pow(2, numberOfDisks) - 1;
+  }
+}
+
+function mouseWheel(event){
+  numberOfDisks = constrain((numberOfDisks + (event.delta>0 ? 1 : -1)), 1, 10);
+  idealSteps = pow(2, numberOfDisks) - 1;
+  initializeTowers();
+  generateDiscColors();
+}
+
+function displayInstructions(){
+  fill(0);
+  textSize(20);
+  text("Tower of Hanoi", 10, 50);
+  text("Number of Disks: " + numberOfDisks, 10, 75);
+  text("Steps: " + steps, 10,100);
+  text("Ideal Steps: " + idealSteps, 10, 125);
+  text("Instructions:", 10, height - 110);
+  text("Click on a disk to select it", 10, height - 85);
+  text("Click on a tower to move the selected disk to that tower", 10, height - 60);
+  text("Press 'R' to reset the game", 10, height - 35);
+  text("Use the mouse wheel to increase or decrease the number of disks", 10, height - 10);
 }
