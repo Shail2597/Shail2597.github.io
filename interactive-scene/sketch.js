@@ -82,7 +82,15 @@ function drawDiscs(){
 }
 
 function mousePressed(){
+  for (let i =1;i<4;i++){
+    if (mouseX>(i * tower_x - 3*tower_width) && mouseX<(i * tower_x + 3*tower_width) && mouseY>(tower_y - tower_height/2 - 30 ) && mouseY<(tower_y + tower_height/2 + 30 )){
+      if (!isDiskSelected){
+        isDiskSelected = true;
+        console.log("Disk Selected");
 
+      }
+    }
+  }
 }
 
 function keyPressed(){
