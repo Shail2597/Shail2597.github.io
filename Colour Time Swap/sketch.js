@@ -19,26 +19,22 @@ function draw()
   showBackground();
 }
 
-function swapStateifNeeded() 
-{
-  if (millis() > lastSwitchTime + waitTime) 
-  {
+function swapStateifNeeded() {
+  if (millis() > lastSwitchTime + waitTime) {
     isWhite = !isWhite;
     lastSwitchTime = millis();
   }
 }
-function showBackground() 
-{
-  if (isWhite) 
-  {
+
+function showBackground(){
+  if (isWhite) {
     background("white");
   } 
-  else 
-  {
+  else {
     background("black");
   }
 }
-function windowResized()
-{
+
+function windowResized(){
   resizeCanvas(windowWidth, windowHeight);
 }

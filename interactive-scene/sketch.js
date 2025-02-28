@@ -10,16 +10,12 @@
 
 let towers = [[],[],[]];
 let numberOfDisks = 5;
-let colors, steps, tower_height, tower_width, tower_x, tower_y,tower_bottom, idealSteps, discSize;
+let colors, steps, tower_height, tower_width, tower_x, tower_y, idealSteps, discSize;
+let isDiskSelected = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  tower_x = width/4;
-  tower_y = height/2;
-  tower_width = 10;
-  tower_height = height * 0.55;
-  tower_bottom = tower_y + tower_height/2;
-  discSize = tower_height/15;
+  declareVariables();
   initializeTowers();
   generateDiscColors();
 }
@@ -29,14 +25,20 @@ function draw() {
   background(220);
   drawTowers();
   drawDiscs();
-  console.log(numberOfDisks);
   displayInstructions();
 }
 
-
+function declareVariables(){
+  tower_x = width/4;
+  tower_y = height/2;
+  tower_width = 10;
+  tower_height = height * 0.55;
+  discSize = tower_height/15;
+}
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  declareVariables();
 }
 
 function generateDiscColors(){
@@ -74,17 +76,21 @@ function drawDiscs(){
       fill(colors[towers[i][j]-1]);
       stroke(0);
       rectMode(CENTER);
-      rect((i+1) * tower_x, (tower_y-j*discSize) + (tower_height/2),( discSize * towers[i][j]) ,discSize);
+      rect((i+1) * tower_x, (tower_y-j*discSize) + (tower_height/2) - (discSize/2),( discSize * towers[i][j]) ,discSize);
     }
   }
+}
+
+function mousePressed(){
+
 }
 
 function keyPressed(){
   if (key === 'r' || key === 'R')
   {
+    numberOfDisks = 5;
     initializeTowers();
     generateDiscColors();
-    numberOfDisks = 5;
     idealSteps = pow(2, numberOfDisks) - 1;
   }
 }
@@ -98,8 +104,9 @@ function mouseWheel(event){
 
 function displayInstructions(){
   fill(0);
-  textSize(20);
+  textSize(40);
   text("Tower of Hanoi", 10, 50);
+  textSize(20);
   text("Number of Disks: " + numberOfDisks, 10, 75);
   text("Steps: " + steps, 10,100);
   text("Ideal Steps: " + idealSteps, 10, 125);
