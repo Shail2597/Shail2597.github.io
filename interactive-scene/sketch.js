@@ -5,13 +5,14 @@
 // Extra for Experts:
 // - I have used the windowResized function to resize the canvas when the window is resized
 // - I have used the mouseWheel function to increase the number of disks when the mouse wheel is scrolled UP and DECREASE the number of disks when the mouse wheel is scrolled DOWN
-// - I have also used constrain function to limit the number of disks between 1 and 10
+// - I have also used constrain function to limit the number of disks between 1 and 15
 
 
 let towers = [[],[],[]];
 let numberOfDisks = 5;
 let colors, steps, tower_height, tower_width, tower_x, tower_y, idealSteps, discSize;
 let isDiskSelected = false;
+let selectedDisk, selectedDiskIndex;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -82,12 +83,25 @@ function drawDiscs(){
 }
 
 function mousePressed(){
-  for (let i =1;i<4;i++){
-    if (mouseX>(i * tower_x - 3*tower_width) && mouseX<(i * tower_x + 3*tower_width) && mouseY>(tower_y - tower_height/2 - 30 ) && mouseY<(tower_y + tower_height/2 + 30 )){
-      if (!isDiskSelected){
-        isDiskSelected = true;
-        console.log("Disk Selected");
-
+  for (let i = 0;i<3;i++){
+    if (mouseX>((i+1) * tower_x - tower_width*3) && mouseX<((i+1) * tower_x + 3*tower_width) && mouseY>(tower_y - tower_height/2 - 30 ) && mouseY<(tower_y + tower_height/2 + 30 )){
+      if (isDiskSelected){
+        if (towers[i].length === 0 || (towers[i][towers[i].length - 1] > selectedDisk)){
+          towers[i].push(selectedDisk);
+          isDiskSelected = false;
+          steps++;
+        }
+        else {
+          towers[selectedDiskIndex].push(selectedDisk);
+          isDiskSelected = false;
+        }
+      }
+      else{
+        if (towers[i].length > 0){
+          selectedDisk = towers[i],pop();
+          selectedDiskIndex = i;
+          isDiskSelected = true;
+        }
       }
     }
   }
@@ -104,7 +118,7 @@ function keyPressed(){
 }
 
 function mouseWheel(event){
-  numberOfDisks = constrain((numberOfDisks + (event.delta>0 ? 1 : -1)), 1, 10);
+  numberOfDisks = constrain((numberOfDisks + (event.delta>0 ? 1 : -1)), 1, 15);
   idealSteps = pow(2, numberOfDisks) - 1;
   initializeTowers();
   generateDiscColors();
