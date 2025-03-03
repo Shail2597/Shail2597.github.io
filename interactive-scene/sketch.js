@@ -70,10 +70,8 @@ function drawTowers(){
 }
 
 function drawDiscs(){
-  for (let i = 0; i < 3; i++)
-  {
-    for (let j = 0; j < towers[i].length; j++)
-    {
+  for (let i = 0; i < 3; i++){
+    for (let j = 0; j < towers[i].length; j++){
       fill(colors[towers[i][j]-1]);
       stroke(0);
       rectMode(CENTER);
@@ -86,21 +84,18 @@ function mousePressed(){
   for (let i = 0;i<3;i++){
     if (mouseX>((i+1) * tower_x - tower_width*3) && mouseX<((i+1) * tower_x + 3*tower_width) && mouseY>(tower_y - tower_height/2 - 30 ) && mouseY<(tower_y + tower_height/2 + 30 )){
       if (isDiskSelected){
-        if (towers[i].length === 0 || (towers[i][towers[i].length - 1] > selectedDisk)){
+        if (towers[i].length === 0 || towers[i][towers[i].length-1] > selectedDisk){
           towers[i].push(selectedDisk);
-          isDiskSelected = false;
           steps++;
-        }
-        else {
-          towers[selectedDiskIndex].push(selectedDisk);
           isDiskSelected = false;
         }
       }
       else{
         if (towers[i].length > 0){
-          selectedDisk = towers[i],pop();
+          selectedDisk = towers[i][towers[i].length-1];
           selectedDiskIndex = i;
           isDiskSelected = true;
+          towers[selectedDiskIndex].pop();
         }
       }
     }
