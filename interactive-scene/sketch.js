@@ -52,8 +52,7 @@ function generateDiscColors(){
 
 function initializeTowers(){
   towers = [[],[],[]];
-  for (let i = numberOfDisks; i > 0; i--)
-  {
+  for (let i = numberOfDisks; i > 0; i--){
     towers[0].push(i);
   }
   steps = 0;
@@ -93,9 +92,8 @@ function mousePressed(){
       else{
         if (towers[i].length > 0){
           selectedDisk = towers[i][towers[i].length-1];
-          selectedDiskIndex = i;
           isDiskSelected = true;
-          towers[selectedDiskIndex].pop();
+          towers[i].pop();
         }
       }
     }
@@ -103,8 +101,7 @@ function mousePressed(){
 }
 
 function keyPressed(){
-  if (key === 'r' || key === 'R')
-  {
+  if (key === 'r' || key === 'R'){
     numberOfDisks = 5;
     initializeTowers();
     generateDiscColors();
@@ -117,6 +114,8 @@ function mouseWheel(event){
   idealSteps = pow(2, numberOfDisks) - 1;
   initializeTowers();
   generateDiscColors();
+  selectedDisk = null;
+  isDiskSelected = false;
 }
 
 function displayInstructions(){
