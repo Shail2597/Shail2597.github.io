@@ -9,24 +9,34 @@ function setup() {
 
 function draw() {
   background(220);
-
   for (let ball of ballArray) {
-    // display the ball
-    fill('red');
-    circle(ball.x, ball.y, ball.diameter);
-    //teleport the ball
-    teleeportBall(ball);
-    // move the ball
-    ball.x += ball.dx;
-    ball.y += ball.dy;
+    moveBalls(ball);
+    displayBalls(ball);
   }
+
 }
+
+function moveBalls(ball) {
+  //teleport the ball
+  teleeportBall(ball);
+  // move the ball
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+  
+}
+
+function displayBalls(ball) {
+  noStroke();
+  fill(255, 0, 0);
+  circle(ball.x, ball.y, ball.diameter);
+}
+
 
 function spawnBall() {
   let someBall = {
     x: random(width),
     y: random(height),
-    diameter: random(25, 100),
+    diameter: random(200, 300),
     dx: random(-5, 5),
     dy: random(-5, 5),
   };
@@ -38,16 +48,16 @@ function mousePressed() {
 }
 
 function teleeportBall(ball) {
-  if (ball.x > width) {
-    ball.x = 0;
+  if (ball.x - ball.diameter/2   > width) {
+    ball.x =  - ball.diameter/2;
   }
-  if (ball.x < 0) {
-    ball.x = width;
+  else if (ball.x + ball.diameter/2 < 0) {
+    ball.x = width + ball.diameter/2;
   }
-  if (ball.y > height) {
-    ball.y = 0;
+  else if (ball.y - ball.diameter/2 > height) {
+    ball.y =  - ball.diameter/2;
   }
-  if (ball.y < 0) {
-    ball.y = height;
+  else if (ball.y + ball.diameter/2 < 0) {
+    ball.y = height + ball.diameter/2;
   }
 }
