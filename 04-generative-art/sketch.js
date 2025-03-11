@@ -27,7 +27,6 @@ function draw() {
     stroke(red, green, blue);
     strokeWeight(random(5));
     drawLine(line);
-
   }
 }
 
