@@ -4,7 +4,8 @@
 - [Bouncing Balls](bouncing-balls)
 - [Generative Art](04-geerative-art)
 - [Perlin Noise](05-perlin-noise)
+- [Terrain Generation](06-terrain)
 
 # CS30 Projects
-- [Interactive Scene](interactive-scene)
-- [Array & Object Notation](object-notation-and-array)
+- [Interactive Scene | Tower Of Hanoi](interactive-scene)
+- [Array & Object Notation | Ball Sorting Game](object-notation-and-array)
