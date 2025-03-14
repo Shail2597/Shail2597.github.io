@@ -6,6 +6,7 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let video;
 let colours = ["red", "green", "blue", "yellow", "purple", "orange", "pink", "brown"];
 let balls = {};
 let containerWidth, containerHeight, ball_diameter;
@@ -13,14 +14,15 @@ let containers = {};
 
 
 function setup() {
+  video = createCapture(VIDEO);
   createCanvas(windowWidth, windowHeight);
+  video.size(width, height);
   updateDimensions();
   createContainers();
 }
 
 function draw() {
-  background(220);
-  drawContainers();
+  background(255);
 }
 
 function windowResized() {
