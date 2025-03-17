@@ -47,8 +47,9 @@ function createContainers() {
 
 function updateDimensions() {
   containerWidth = width / 10;
-  containerHeight = height * 0.6;
-  ball_diameter = containerWidth;
+  ball_diameter = containerWidth * 0.75;
+  containerHeight =  ball_diameter*4;
+
 }
 
 
@@ -68,27 +69,19 @@ function createBall() {
     balls[i] = [];
     for (let j = 0; j < 4; j++) {
       balls[i].push({
-      // Random x position within the container
-        x: containers[i].x + random(-containerWidth / 2 + ball_diameter / 2, containerWidth / 2 - ball_diameter / 2),
-        // Random y position within the container
-        y: containers[i].y + random(-containerHeight / 2 + ball_diameter / 2, containerHeight / 2 - ball_diameter / 2),
-        // Assign a color from the colours array
-        Colour: colours[j % colours.length],
+        x: containers[i].x,
+        y:(height -  containers[i].y) + containers[i].height - ball_diameter/2,
+        colour: colours[j % colours.length],
       });
     }
   }
 }
 
 function drawBalls() {
-  // Loop through each container in the balls object
   for (let containerIndex in balls) {
-    // Loop through each ball in the container
     for (let ball of balls[containerIndex]) {
-      // Set the fill color to the ball's color
-      fill(ball.Colour);
-      // Disable stroke
+      fill(ball.colour);
       noStroke();
-      // Draw the ball as an ellipse at its position with the specified diameter
       ellipse(ball.x, ball.y, ball_diameter);
     }
   }

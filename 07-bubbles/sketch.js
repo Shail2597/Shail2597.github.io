@@ -47,3 +47,12 @@ function spawnBubble(){
   };
   theBubbles.push(someBubble);
 }
+
+function mousePressed(){
+  for (let bubble of theBubbles){
+    if (dist(mouseX, mouseY, bubble.x, bubble.y)<bubble.radius){
+      let index = theBubbles.indexOf(bubble);
+      theBubbles.splice(index,1);
+    }
+  }
+}
