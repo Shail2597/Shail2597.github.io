@@ -5,6 +5,7 @@
 - [Generative Art](04-geerative-art)
 - [Perlin Noise](05-perlin-noise)
 - [Terrain Generation](06-terrain)
+- [Bubble Object Notation](07-bubbles)
 
 # CS30 Projects
 - [Interactive Scene | Tower Of Hanoi](interactive-scene)
