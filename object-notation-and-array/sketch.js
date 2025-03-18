@@ -6,16 +6,18 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-
+// Define the colors for the balls
 let colours = ["red", "green", "blue", "yellow"];
+
+// Initialize variables for balls, containers, and dimensions
 let balls = {};
 let containerWidth, containerHeight, ball_diameter;
 let containers = {};
-let selectedBall = null;
-let selectedContainer = null;
-
+let selectedBall = null; // Currently selected ball
+let selectedContainer = null; // Container of the selected ball
 
 function setup() {
+  // Set up the canvas and initialize game elements
   createCanvas(windowWidth, windowHeight);
   updateDimensions();
   createContainers();
@@ -23,12 +25,14 @@ function setup() {
 }
 
 function draw() {
+  // Draw the game elements on the canvas
   background(255);
   drawContainers();
   drawBalls();
 }
 
 function windowResized() {
+  // Handle window resizing and update game elements
   resizeCanvas(windowWidth, windowHeight);
   updateDimensions();
   createContainers();
@@ -36,11 +40,12 @@ function windowResized() {
 }
 
 function createContainers() {
+  // Create container objects with positions and dimensions
   containers = {};
   for (let i = 0; i < 4; i++) {
     containers[i] = {
       x: (i + 1) * width / 5,
-      y: height*2/3,
+      y: height * 2 / 3,
       width: containerWidth,
       height: containerHeight,
     };
@@ -48,13 +53,14 @@ function createContainers() {
 }
 
 function updateDimensions() {
+  // Update dimensions for containers and balls based on canvas size
   containerWidth = width / 10;
   ball_diameter = containerWidth * 0.75;
-  containerHeight =  ball_diameter*4;
+  containerHeight = ball_diameter * 4;
 }
 
-
-function drawContainers(){
+function drawContainers() {
+  // Draw all containers on the canvas
   for (let item in containers) {
     let container = containers[item];
     fill(255);
@@ -65,12 +71,13 @@ function drawContainers(){
 }
 
 function createBall() {
+  // Initialize balls and assign them to containers
   balls = {};
-  for (let i = 0; i < 4; i++) { // Ensure all 4 containers are initialized
+  for (let i = 0; i < 4; i++) {
     balls[i] = []; // Initialize an empty array for each container
   }
   for (let i = 0; i < 3; i++) {
-    let shuffledColours = shuffle([...colours]); // Shuffle the colors for each container
+    let shuffledColours = shuffle([...colours]); // Shuffle the colors for randomness
     for (let j = 0; j < 4; j++) {
       balls[i].push({
         x: containers[i].x,
@@ -82,6 +89,7 @@ function createBall() {
 }
 
 function drawBalls() {
+  // Draw all balls in their respective containers
   for (let containerIndex in balls) {
     for (let ball of balls[containerIndex]) {
       fill(ball.colour);
@@ -93,22 +101,22 @@ function drawBalls() {
 
 function mousePressed() {
   if (selectedBall === null) {
-    // Select a ball
+    // Select a ball if none is currently selected
     for (let containerIndex in balls) {
       let containerBalls = balls[containerIndex];
       if (containerBalls.length > 0) {
         let topBall = containerBalls[containerBalls.length - 1]; // Get the topmost ball
         let distance = dist(mouseX, mouseY, topBall.x, topBall.y);
         if (distance < ball_diameter / 2) {
-          selectedBall = topBall;
-          selectedContainer = containerIndex;
+          selectedBall = topBall; // Mark the ball as selected
+          selectedContainer = containerIndex; // Store its container
           balls[containerIndex].pop(); // Remove the ball from its container
           return;
         }
       }
     }
   } else {
-    // Place the ball in a new container
+    // Place the selected ball in a new container
     for (let containerIndex in containers) {
       let container = containers[containerIndex];
       if (
@@ -119,15 +127,21 @@ function mousePressed() {
       ) {
         // Check if the container is not full
         if (balls[containerIndex].length < 4) {
-          selectedBall.x = container.x;
+          selectedBall.x = container.x; // Update ball's position
           selectedBall.y =
             container.y +
             containerHeight / 2 -
             ball_diameter / 2 -
             balls[containerIndex].length * ball_diameter;
           balls[containerIndex].push(selectedBall); // Add the ball to the new container
-          selectedBall = null;
+          selectedBall = null; // Reset selection
           selectedContainer = null;
+
+          // Check if the game is won
+          if (checkWinCondition()) {
+            console.log("You win!"); // Display a win message
+            noLoop(); // Stop the game loop
+          }
           return;
         } else {
           console.log("Container is full!"); // Optional feedback
@@ -139,4 +153,20 @@ function mousePressed() {
     selectedBall = null;
     selectedContainer = null;
   }
+}
+
+function checkWinCondition() {
+  // Check if all containers are sorted by color
+  for (let containerIndex in balls) {
+    let containerBalls = balls[containerIndex];
+    if (containerBalls.length > 0) {
+      let firstColor = containerBalls[0].colour; // Get the color of the first ball
+      for (let ball of containerBalls) {
+        if (ball.colour !== firstColor) {
+          return false; // If any ball is of a different color, the game is not won
+        }
+      }
+    }
+  }
+  return true; // All containers are sorted by color
 }
