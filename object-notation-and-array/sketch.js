@@ -16,20 +16,62 @@ let containers = {};
 let selectedBall = null; // Currently selected ball
 let selectedContainer = null; // Container of the selected ball
 
+
+let video;
+let handPose;
+let hands = [];
+let painting;
+let px = 0;
+let py = 0;
+
+function preload() {
+  // Initialize HandPose model with flipped video input
+  handPose = ml5.handPose({ flipped: true });
+}
+
+function gotHands(results) {
+  hands = results;
+}
+
 function setup() {
-  // Set up the canvas and initialize game elements
+  // Create the canvas
   createCanvas(windowWidth, windowHeight);
+    
+  // Create video capture
+  video = createCapture(VIDEO, { flipped: true });
+  video.hide(); // Hide the video element
+    
+  // Initialize HandPose model
+  handPose = ml5.handPose(video, modelLoaded);
+    
+  // Start detecting hands
+  handPose.detect(gotHands);
+    
+  // Initialize game elements
   updateDimensions();
   createContainers();
   createBall();
 }
+  
+function modelLoaded() {
+  console.log("HandPose model loaded");
+}
+  
+
 
 function draw() {
-  // Draw the game elements on the canvas
+  // Step 1: Clear the background with white
   background(255);
+    
+  // Step 2: Draw the game elements on top of the white background
   drawContainers();
   drawBalls();
+    
+  // Step 3: Handle finger touch for painting, which will draw on top
+  fingerTouch();  
 }
+   
+
 
 function windowResized() {
   // Handle window resizing and update game elements
@@ -77,11 +119,11 @@ function createBall() {
     balls[i] = []; // Initialize an empty array for each container
   }
   for (let i = 0; i < 3; i++) {
-    let shuffledColours = shuffle([...colours]); // Shuffle the colors for randomness
+    let shuffledColours = shuffle(colours); // Shuffle the colors for randomness
     for (let j = 0; j < 4; j++) {
       balls[i].push({
         x: containers[i].x,
-        y: containers[i].y + containerHeight / 2 - ball_diameter / 2 - (j * ball_diameter),
+        y: containers[i].y + containerHeight / 2 - ball_diameter / 2 - j * ball_diameter,
         colour: shuffledColours[j % shuffledColours.length],
       });
     }
@@ -115,7 +157,8 @@ function mousePressed() {
         }
       }
     }
-  } else {
+  }
+  else {
     // Place the selected ball in a new container
     for (let containerIndex in containers) {
       let container = containers[containerIndex];
@@ -143,7 +186,8 @@ function mousePressed() {
             noLoop(); // Stop the game loop
           }
           return;
-        } else {
+        }
+        else {
           console.log("Container is full!"); // Optional feedback
         }
       }
@@ -169,4 +213,30 @@ function checkWinCondition() {
     }
   }
   return true; // All containers are sorted by color
+}
+
+function fingerTouch(){
+  if (hands.length > 0) {
+    let hand = hands[0];
+    let index = hand.index_finger_tip;
+    let thumb = hand.thumb_tip;
+
+    // Compute midpoint between index finger and thumb
+    let x = (index.x + thumb.x) * 0.5;
+    let y = (index.y + thumb.y) * 0.5;
+
+    // Draw only if fingers are close together
+    let d = dist(index.x, index.y, thumb.x, thumb.y);
+    if (d < 20) {
+      painting.stroke(255, 255, 0);
+      painting.strokeWeight(8);
+      painting.line(px, py, x, y);
+    }
+    // Update previous position
+    px = x;
+    py = y;
+  }
+
+  // Overlay painting on top of the video
+  image(painting, 0, 0);
 }
