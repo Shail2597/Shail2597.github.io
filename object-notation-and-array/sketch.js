@@ -16,7 +16,8 @@ let containers = {};
 let selectedBall = null; // Currently selected ball
 let selectedContainer = null; // Container of the selected ball
 
-
+let videoCanvas;
+let gameCanvas;
 let video;
 let handPose;
 let hands = [];
@@ -36,41 +37,33 @@ function gotHands(results) {
 function setup() {
   // Create the canvas
   createCanvas(windowWidth, windowHeight);
-    
+  gameCanvas = createGraphics(windowWidth, windowHeight);  
   // Create video capture
   video = createCapture(VIDEO, { flipped: true });
+  video.size(windowWidth, windowHeight);
   video.hide(); // Hide the video element
     
-  // Initialize HandPose model
-  handPose = ml5.handPose(video, modelLoaded);
-    
   // Start detecting hands
-  handPose.detect(gotHands);
-    
+  handPose.detect(video, gotHands);
   // Initialize game elements
   updateDimensions();
   createContainers();
   createBall();
 }
-  
-function modelLoaded() {
-  console.log("HandPose model loaded");
-}
-  
 
 
 function draw() {
+  image(video, 0, 0, width, height);
   // Step 1: Clear the background with white
-  background(255);
-    
+  //gameCanvas.background(255);
   // Step 2: Draw the game elements on top of the white background
   drawContainers();
   drawBalls();
     
   // Step 3: Handle finger touch for painting, which will draw on top
-  fingerTouch();  
+  //image(gameCanvas, 0, 0);
+  fingerTouch(); 
 }
-   
 
 
 function windowResized() {
@@ -105,10 +98,10 @@ function drawContainers() {
   // Draw all containers on the canvas
   for (let item in containers) {
     let container = containers[item];
-    fill(255);
-    stroke(0);
-    rectMode(CENTER);
-    rect(container.x, container.y, container.width, container.height);
+    gameCanvas.fill(255);
+    gameCanvas.stroke(0);
+    gameCanvas.rectMode(CENTER);
+    gameCanvas.rect(container.x, container.y, container.width, container.height);
   }
 }
 
@@ -134,9 +127,9 @@ function drawBalls() {
   // Draw all balls in their respective containers
   for (let containerIndex in balls) {
     for (let ball of balls[containerIndex]) {
-      fill(ball.colour);
-      noStroke();
-      ellipse(ball.x, ball.y, ball_diameter);
+      gameCanvas.fill(ball.colour);
+      gameCanvas.noStroke();
+      gameCanvas.ellipse(ball.x, ball.y, ball_diameter);
     }
   }
 }
@@ -228,9 +221,9 @@ function fingerTouch(){
     // Draw only if fingers are close together
     let d = dist(index.x, index.y, thumb.x, thumb.y);
     if (d < 20) {
-      painting.stroke(255, 255, 0);
-      painting.strokeWeight(8);
-      painting.line(px, py, x, y);
+      gameCanvas.stroke(255, 255, 0);
+      gameCanvas.strokeWeight(8);
+      gameCanvas.line(px, py, x, y);
     }
     // Update previous position
     px = x;
@@ -238,5 +231,5 @@ function fingerTouch(){
   }
 
   // Overlay painting on top of the video
-  image(painting, 0, 0);
+  image(gameCanvas, 0, 0);
 }
