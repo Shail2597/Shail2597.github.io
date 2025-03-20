@@ -13,6 +13,7 @@ let colours = ["red", "green", "blue", "yellow"];
 let balls = {};
 let containerWidth, containerHeight, ball_diameter;
 let containers = {};
+let containerBalls;
 let selectedBall = null; // Currently selected ball
 let selectedContainer = null; // Container of the selected ball
 let gameOver = false; // Flag to indicate if the game is over
@@ -43,8 +44,6 @@ function setup() {
   video = createCapture(VIDEO, {flipped: true});
   video.size(windowWidth, windowHeight);
   video.hide(); // Hide the video element
-    
-  // Start detecting hands
   
   // Initialize game elements
   updateDimensions();
@@ -61,20 +60,10 @@ function draw() {
   // Step 2: Draw the game elements on top of the white background
   drawContainers();
   drawBalls();
-  
   // Step 3: Handle finger touch for painting, which will draw on top
-  if (!gameOver) {
-    fingerTouch(); 
-  }
+  fingerTouch();
   image(gameCanvas, 0, 0);
-
-  // Display win message if the game is over
-  if (gameOver) {
-    textSize(32);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    text("You win!", width / 2, height / 2);
-  }
+  gameWon();
 }
 
 
@@ -153,7 +142,7 @@ function mousePressed() {
   if (selectedBall === null) {
     // Select a ball if none is currently selected
     for (let containerIndex in balls) {
-      let containerBalls = balls[containerIndex];
+      containerBalls = balls[containerIndex];
       if (containerBalls.length > 0) {
         let topBall = containerBalls[containerBalls.length - 1]; // Get the topmost ball
         let distance = dist(mouseX, mouseY, topBall.x, topBall.y);
@@ -183,11 +172,6 @@ function mousePressed() {
           selectedBall = null; // Reset selection
           selectedContainer = null;
 
-          // Check if the game is won
-          if (checkWinCondition()) {
-            console.log("You win!"); // Display a win message
-            noLoop(); // Stop the game loop
-          }
           return;
         }
         else {
@@ -200,24 +184,6 @@ function mousePressed() {
     selectedBall = null;
     selectedContainer = null;
   }
-}
-
-function checkWinCondition() {
-  // Check if all containers are sorted by color
-  for (let containerIndex in balls) {
-    let containerBalls = balls[containerIndex];
-    if (containerBalls.length > 0) {
-      let firstColor = containerBalls[0].colour; // Get the color of the first ball
-      for (let ball of containerBalls) {
-        if (ball.colour !== firstColor) {
-          return false; // If any ball is of a different color, the game is not won
-        }
-      }
-    }
-  }
-  gameOver = true; // Set the gameOver flag
-  console.log("You win!"); // Display a win message
-  return true; // All containers are sorted by color
 }
 
 function fingerTouch() {
@@ -241,10 +207,9 @@ function fingerTouch() {
         // Try to pick up the topmost ball from a container
         for (let containerIndex in containers) {
           let container = containers[containerIndex];
-
           // Check if the pinch is over a container
           if ( x > container.x - container.width / 2 && x < container.x + container.width / 2 && y > container.y - container.height / 2 && y < container.y + container.height / 2 ) {
-            let containerBalls = balls[containerIndex];
+            containerBalls = balls[containerIndex];
             if (containerBalls.length > 0) {
               selectedBall = containerBalls.pop(); // Pick up the topmost ball
               selectedContainer = containerIndex; // Store the container index
@@ -273,12 +238,6 @@ function fingerTouch() {
             balls[containerIndex].push(selectedBall); // Add the ball to the new container
             selectedBall = null; // Reset selection
             selectedContainer = null;
-
-            // Check if the game is won
-            if (checkWinCondition()) {
-              console.log("You win!"); // Display a win message
-              noLoop(); // Stop the game loop
-            }
             return;
           } 
           else {
@@ -293,4 +252,26 @@ function fingerTouch() {
       selectedContainer = null;
     }
   }
+}
+
+function gameWon(){
+  for (let containerIndex in balls) {
+    containerBalls = balls[containerIndex];
+    if (containerBalls.length > 0) {
+      let firstColor = containerBalls[0].colour; // Get the color of the first ball
+      for (let ball of containerBalls) {
+        if (ball.colour !== firstColor) {
+          if (containerBalls.length !== 3){
+            return false; // If any ball is of a different color, the game is not won
+          }
+        }
+      }
+    }
+  }
+
+  gameOver = true; // Set the gameOver flag to true
+  textSize(42);
+  fill(0);
+  text("You Win!", width / 2, height / 2);
+  return true; // All containers are sorted by color
 }
