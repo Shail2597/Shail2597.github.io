@@ -15,6 +15,7 @@ let containerWidth, containerHeight, ball_diameter;
 let containers = {};
 let selectedBall = null; // Currently selected ball
 let selectedContainer = null; // Container of the selected ball
+let gameOver = false; // Flag to indicate if the game is over
 
 let videoCanvas;
 let gameCanvas;
@@ -27,7 +28,7 @@ let py = 0;
 
 function preload() {
   // Initialize HandPose model with flipped video input
-  handPose = ml5.handPose({ flipped: true });
+  handPose = ml5.handPose();
 }
 
 function gotHands(results) {
@@ -39,12 +40,12 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   gameCanvas = createGraphics(windowWidth, windowHeight);  
   // Create video capture
-  video = createCapture(VIDEO, { flipped: true });
+  video = createCapture(VIDEO, {flipped: true});
   video.size(windowWidth, windowHeight);
   video.hide(); // Hide the video element
     
   // Start detecting hands
-  handPose.detect(video, gotHands);
+  
   // Initialize game elements
   updateDimensions();
   createContainers();
@@ -54,15 +55,26 @@ function setup() {
 
 function draw() {
   image(video, 0, 0, width, height);
+  handPose.detect(video, gotHands);
   // Step 1: Clear the background with white
   //gameCanvas.background(255);
   // Step 2: Draw the game elements on top of the white background
   drawContainers();
   drawBalls();
-    
+  
   // Step 3: Handle finger touch for painting, which will draw on top
-  //image(gameCanvas, 0, 0);
-  fingerTouch(); 
+  if (!gameOver) {
+    fingerTouch(); 
+  }
+  image(gameCanvas, 0, 0);
+
+  // Display win message if the game is over
+  if (gameOver) {
+    textSize(32);
+    fill(0);
+    textAlign(CENTER, CENTER);
+    text("You win!", width / 2, height / 2);
+  }
 }
 
 
@@ -135,6 +147,9 @@ function drawBalls() {
 }
 
 function mousePressed() {
+  if (gameOver) {
+    return;
+  } // Prevent interaction if the game is over
   if (selectedBall === null) {
     // Select a ball if none is currently selected
     for (let containerIndex in balls) {
@@ -155,12 +170,7 @@ function mousePressed() {
     // Place the selected ball in a new container
     for (let containerIndex in containers) {
       let container = containers[containerIndex];
-      if (
-        mouseX > container.x - container.width / 2 &&
-        mouseX < container.x + container.width / 2 &&
-        mouseY > container.y - container.height / 2 &&
-        mouseY < container.y + container.height / 2
-      ) {
+      if (mouseX > container.x - container.width / 2 && mouseX < container.x + container.width / 2 && mouseY > container.y - container.height / 2 && mouseY < container.y + container.height / 2 ) {
         // Check if the container is not full
         if (balls[containerIndex].length < 4) {
           selectedBall.x = container.x; // Update ball's position
@@ -205,10 +215,15 @@ function checkWinCondition() {
       }
     }
   }
+  gameOver = true; // Set the gameOver flag
+  console.log("You win!"); // Display a win message
   return true; // All containers are sorted by color
 }
 
-function fingerTouch(){
+function fingerTouch() {
+  if (gameOver){
+    return;
+  } // Prevent interaction if the game is over
   if (hands.length > 0) {
     let hand = hands[0];
     let index = hand.index_finger_tip;
@@ -218,18 +233,64 @@ function fingerTouch(){
     let x = (index.x + thumb.x) * 0.5;
     let y = (index.y + thumb.y) * 0.5;
 
-    // Draw only if fingers are close together
+    // Calculate the distance between index finger and thumb
     let d = dist(index.x, index.y, thumb.x, thumb.y);
-    if (d < 20) {
-      gameCanvas.stroke(255, 255, 0);
-      gameCanvas.strokeWeight(8);
-      gameCanvas.line(px, py, x, y);
-    }
-    // Update previous position
-    px = x;
-    py = y;
-  }
 
-  // Overlay painting on top of the video
-  image(gameCanvas, 0, 0);
+    if (d < 35) { // Pinch gesture detected
+      if (selectedBall === null) {
+        // Try to pick up the topmost ball from a container
+        for (let containerIndex in containers) {
+          let container = containers[containerIndex];
+
+          // Check if the pinch is over a container
+          if ( x > container.x - container.width / 2 && x < container.x + container.width / 2 && y > container.y - container.height / 2 && y < container.y + container.height / 2 ) {
+            let containerBalls = balls[containerIndex];
+            if (containerBalls.length > 0) {
+              selectedBall = containerBalls.pop(); // Pick up the topmost ball
+              selectedContainer = containerIndex; // Store the container index
+              console.log("Picked up ball:", selectedBall);
+            }
+            return;
+          }
+        }
+      }
+    } 
+    else if (d > 55 && selectedBall !== null) { // Release gesture detected
+      // Try to place the ball in a container
+      for (let containerIndex in containers) {
+        let container = containers[containerIndex];
+
+        // Check if the release is over a container
+        if ( x > container.x - container.width / 2 && x < container.x + container.width / 2 && y > container.y - container.height / 2 && y < container.y + container.height / 2 ) {
+          // Check if the container is not full
+          if (balls[containerIndex].length < 4) {
+            selectedBall.x = container.x; // Update ball's position
+            selectedBall.y =
+              container.y +
+              containerHeight / 2 -
+              ball_diameter / 2 -
+              balls[containerIndex].length * ball_diameter;
+            balls[containerIndex].push(selectedBall); // Add the ball to the new container
+            selectedBall = null; // Reset selection
+            selectedContainer = null;
+
+            // Check if the game is won
+            if (checkWinCondition()) {
+              console.log("You win!"); // Display a win message
+              noLoop(); // Stop the game loop
+            }
+            return;
+          } 
+          else {
+            console.log("Container is full!"); // Optional feedback
+          }
+        }
+      }
+
+      // If no valid container is found, return the ball to its original container
+      balls[selectedContainer].push(selectedBall);
+      selectedBall = null;
+      selectedContainer = null;
+    }
+  }
 }

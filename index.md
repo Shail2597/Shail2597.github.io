@@ -8,5 +8,5 @@
 - [Bubble Object Notation](07-bubbles)
 
 # CS30 Projects
-- [Interactive Scene | Tower Of Hanoi](interactive-scene)
-- [Array & Object Notation | Ball Sorting Game](object-notation-and-array)
+- [Interactive Scene / Tower Of Hanoi](interactive-scene)
+- [Array & Object Notation/ Ball Sorting Game](object-notation-and-array)
