@@ -4,10 +4,29 @@
 // 11 March 2025
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - I used the ML5 library's Hand Pose model to implement hand tracking in the game. 
+// The model detects the positions of key points on the hand, such as the index finger tip and thumb tip. Using this data, 
+// I implemented pinch gestures to pick up balls and release gestures to drop them into containers. 
+// This adds an interactive and modern touch to the game by allowing users to play without a mouse or keyboard.
+
+// - I used the alert function to display instructions to the user at the start of the game. 
+// This ensures that even first-time players can easily understand the objective and controls of the game.
+
+// - I utilized two graphics buffers (videoCanvas and gameCanvas) to separate the video feed and game elements: 
+// 1. videoCanvas is used to display the video feed and hand tracking, ensuring that the hand gestures are visually represented. 
+// 2. gameCanvas is used to draw all game elements, such as the heading, containers, balls, and confetti. 
+// This separation ensures a clean and organized display, with the game visuals layered on top of the video feed.
+
 
 // Define the colors for the balls
 let colours = ["red", "green", "blue", "yellow"];
+
+// Object that draws confetti in the end
+let confetti = {
+  particles: [], 
+  count: 100,
+  colors: [], 
+};
 
 // Initialize variables for balls, containers, and dimensions
 let balls = {}; 
@@ -72,6 +91,11 @@ function draw() {
 
   //Handle finger touch for painting, which will draw on top
   fingerTouch();
+
+  // Draw confetti if the game is over
+  if (gameOver) {
+    drawConfetti();
+  }
 
   // Display the game canvas
   image(gameCanvas, 0, 0);
@@ -170,6 +194,7 @@ function mousePressed() {
           selectedBall = topBall; // Mark the ball as selected
           selectedContainer = containerIndex; // Store its container
           balls[containerIndex].pop();
+          console.log("Picked up ball:", selectedBall);
           return;
         }
       }
@@ -297,20 +322,40 @@ function displayWinScreen() {
   gameCanvas.textSize(64);
   gameCanvas.fill(0); // Black text
   gameCanvas.textAlign(CENTER, CENTER);
-  gameCanvas.text("You Win!", width / 2, height / 3);
+  gameCanvas.text("You Win!", width / 2, height / 4);
 
   gameCanvas.textSize(24);
   gameCanvas.fill(100);
-  gameCanvas.text("Refresh the page to play again!", width / 2, height / 3 + 50);
+  gameCanvas.text("Refresh the page to play again!", width / 2, height / 4 + 50);
 
-  // Add confetti effect
-  for (let i = 0; i < 100; i++) {
-    let x = random(width); // Random x position
-    let y = random(height); // Random y position
-    let size = random(5, 15); // Random size for confetti
-    let color = color(random(255), random(255), random(255)); // Random color
-    gameCanvas.fill(color);
+  generateConfetti();
+}
+
+function generateConfetti() {
+  confetti.particles = []; // Clear any existing confetti
+  for (let i = 0; i < confetti.count; i++) {
+    confetti.particles.push({
+      x: random(width), // Random x position
+      y: random(-height, 0), // Start above the canvas
+      size: random(5, 15), // Random size for confetti
+      color: color(random(255), random(255), random(255)), // Random color
+      speed: random(2, 5), // Random falling speed
+    });
+  }
+}
+
+function drawConfetti() {
+  for (let i = 0; i < confetti.particles.length; i++) {
+    let particle = confetti.particles[i];
+    gameCanvas.fill(particle.color);
     gameCanvas.noStroke();
-    gameCanvas.ellipse(x, y, size); // Draw confetti as small circles
+    gameCanvas.ellipse(particle.x, particle.y, particle.size);
+    // Move the confetti down
+    particle.y += particle.speed;
+    // Reset confetti position if it goes off-screen
+    if (particle.y > height) {
+      particle.y = random(-height, 0); // Reset to above the canvas
+      particle.x = random(width); // Randomize x position
+    }
   }
 }
