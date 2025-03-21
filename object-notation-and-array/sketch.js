@@ -320,12 +320,12 @@ function gameWon() {
 function displayWinScreen() {
   // Display "You Win!" message 
   gameCanvas.textSize(64);
-  gameCanvas.fill(0); // Black text
+  gameCanvas.fill(255,0,0); // Black text
   gameCanvas.textAlign(CENTER, CENTER);
   gameCanvas.text("You Win!", width / 2, height / 4);
 
   gameCanvas.textSize(24);
-  gameCanvas.fill(100);
+  gameCanvas.fill(0,255,0);
   gameCanvas.text("Refresh the page to play again!", width / 2, height / 4 + 50);
 
   generateConfetti();
