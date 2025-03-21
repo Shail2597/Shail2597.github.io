@@ -10,36 +10,46 @@
 let colours = ["red", "green", "blue", "yellow"];
 
 // Initialize variables for balls, containers, and dimensions
-let balls = {};
+let balls = {}; 
 let containerWidth, containerHeight, ball_diameter;
-let containers = {};
-let containerBalls;
-let selectedBall = null; // Currently selected ball
-let selectedContainer = null; // Container of the selected ball
-let gameOver = false; // Flag to indicate if the game is over
+let containers = {}; 
+let containerBalls; 
+let selectedBall = null;
+let selectedContainer = null;
+let gameOver = false;
 
-let videoCanvas;
-let gameCanvas;
-let video;
-let handPose;
-let hands = [];
-let painting;
-let px = 0;
-let py = 0;
+// Variables for video input and hand tracking
+let videoCanvas, gameCanvas, video, handPose, hands = [];
+let painting, px = 0, py = 0;
 
 function preload() {
-  // Initialize HandPose model with flipped video input
-  handPose = ml5.handPose();
+  // Initialize HandPose model
+  handPose = ml5.handPose(); 
 }
 
 function gotHands(results) {
+  // Update detected hands
   hands = results;
 }
 
 function setup() {
-  // Create the canvas
+  // Display game instructions as prompts
+  alert("Welcome to the Ball Sort Game!");
+  alert(
+    "Instructions:\n" +
+    "- The goal is to sort all the balls in the containers by color.\n" +
+    "- You can interact with the game using either the mouse or hand gestures:\n" +
+    "  * Mouse: Click on a ball to pick it up, then click on a container to drop it.\n" +
+    "  * Hand Gestures: Pinch your fingers to pick up a ball, and release the pinch to drop it.\n" +
+    "- A container can hold a maximum of 4 balls.\n" +
+    "- If you make a mistake, the ball will return to its original container.\n" +
+    "- The game ends when all containers are sorted by color.\n" +
+    "Good luck!"
+  );
+  // Create canvas and game canvas(buffer graphics)
   createCanvas(windowWidth, windowHeight);
   gameCanvas = createGraphics(windowWidth, windowHeight);  
+  
   // Create video capture
   video = createCapture(VIDEO, {flipped: true});
   video.size(windowWidth, windowHeight);
@@ -51,21 +61,29 @@ function setup() {
   createBall();
 }
 
-
 function draw() {
+  // Display the video feed
   image(video, 0, 0, width, height);
   handPose.detect(video, gotHands);
-  // Step 1: Clear the background with white
-  //gameCanvas.background(255);
-  // Step 2: Draw the game elements on top of the white background
+  // Draw the game elements on the buffer graphics
+  drawHeading();
   drawContainers();
   drawBalls();
-  // Step 3: Handle finger touch for painting, which will draw on top
+
+  //Handle finger touch for painting, which will draw on top
   fingerTouch();
+
+  // Display the game canvas
   image(gameCanvas, 0, 0);
-  gameWon();
 }
 
+function drawHeading() {
+  // Draw the heading at the top of the canvas
+  gameCanvas.textSize(48);
+  gameCanvas.fill(0); // Black text
+  gameCanvas.textAlign(CENTER, CENTER);
+  gameCanvas.text("Ball Sort Game", width / 2, 50); // Centered heading
+}
 
 function windowResized() {
   // Handle window resizing and update game elements
@@ -81,8 +99,8 @@ function createContainers() {
   for (let i = 0; i < 4; i++) {
     containers[i] = {
       x: (i + 1) * width / 5,
-      y: height * 2 / 3,
-      width: containerWidth,
+      y: height * 2 / 3, 
+      width: containerWidth, 
       height: containerHeight,
     };
   }
@@ -90,19 +108,19 @@ function createContainers() {
 
 function updateDimensions() {
   // Update dimensions for containers and balls based on canvas size
-  containerWidth = width / 10;
-  ball_diameter = containerWidth * 0.75;
-  containerHeight = ball_diameter * 4;
+  containerWidth = width / 10; 
+  ball_diameter = containerWidth * 0.75; 
+  containerHeight = ball_diameter * 4; 
 }
 
 function drawContainers() {
   // Draw all containers on the canvas
   for (let item in containers) {
     let container = containers[item];
-    gameCanvas.fill(255);
-    gameCanvas.stroke(0);
+    gameCanvas.fill(255); 
+    gameCanvas.stroke(0); 
     gameCanvas.rectMode(CENTER);
-    gameCanvas.rect(container.x, container.y, container.width, container.height);
+    gameCanvas.rect(container.x, container.y, container.width, container.height, 25);
   }
 }
 
@@ -116,9 +134,9 @@ function createBall() {
     let shuffledColours = shuffle(colours); // Shuffle the colors for randomness
     for (let j = 0; j < 4; j++) {
       balls[i].push({
-        x: containers[i].x,
+        x: containers[i].x, 
         y: containers[i].y + containerHeight / 2 - ball_diameter / 2 - j * ball_diameter,
-        colour: shuffledColours[j % shuffledColours.length],
+        colour: shuffledColours[j], 
       });
     }
   }
@@ -136,20 +154,22 @@ function drawBalls() {
 }
 
 function mousePressed() {
+  // Prevent interaction if the game is over
   if (gameOver) {
-    return;
-  } // Prevent interaction if the game is over
+    return; 
+  }
+
   if (selectedBall === null) {
     // Select a ball if none is currently selected
     for (let containerIndex in balls) {
       containerBalls = balls[containerIndex];
       if (containerBalls.length > 0) {
         let topBall = containerBalls[containerBalls.length - 1]; // Get the topmost ball
-        let distance = dist(mouseX, mouseY, topBall.x, topBall.y);
+        let distance = dist(mouseX, mouseY, topBall.x, topBall.y); // Calculate distance to mouse
         if (distance < ball_diameter / 2) {
           selectedBall = topBall; // Mark the ball as selected
           selectedContainer = containerIndex; // Store its container
-          balls[containerIndex].pop(); // Remove the ball from its container
+          balls[containerIndex].pop();
           return;
         }
       }
@@ -163,19 +183,17 @@ function mousePressed() {
         // Check if the container is not full
         if (balls[containerIndex].length < 4) {
           selectedBall.x = container.x; // Update ball's position
-          selectedBall.y =
-            container.y +
-            containerHeight / 2 -
-            ball_diameter / 2 -
-            balls[containerIndex].length * ball_diameter;
-          balls[containerIndex].push(selectedBall); // Add the ball to the new container
-          selectedBall = null; // Reset selection
-          selectedContainer = null;
-
+          selectedBall.y = container.y + containerHeight / 2 - ball_diameter / 2 - balls[containerIndex].length * ball_diameter; 
+          balls[containerIndex].push(selectedBall); 
+          selectedBall = null; 
+          selectedContainer = null; 
+          if (gameWon()) {
+            console.log("Game won!");
+          }
           return;
         }
         else {
-          console.log("Container is full!"); // Optional feedback
+          console.log("Container is full!");
         }
       }
     }
@@ -187,13 +205,15 @@ function mousePressed() {
 }
 
 function fingerTouch() {
-  if (gameOver){
-    return;
-  } // Prevent interaction if the game is over
+  // Prevent interaction if the game is over
+  if (gameOver) {
+    return; 
+  }
+
   if (hands.length > 0) {
-    let hand = hands[0];
-    let index = hand.index_finger_tip;
-    let thumb = hand.thumb_tip;
+    let hand = hands[0]; // Get the first detected hand
+    let index = hand.index_finger_tip; // Index finger tip position
+    let thumb = hand.thumb_tip; // Thumb tip position
 
     // Compute midpoint between index finger and thumb
     let x = (index.x + thumb.x) * 0.5;
@@ -230,18 +250,17 @@ function fingerTouch() {
           // Check if the container is not full
           if (balls[containerIndex].length < 4) {
             selectedBall.x = container.x; // Update ball's position
-            selectedBall.y =
-              container.y +
-              containerHeight / 2 -
-              ball_diameter / 2 -
-              balls[containerIndex].length * ball_diameter;
-            balls[containerIndex].push(selectedBall); // Add the ball to the new container
-            selectedBall = null; // Reset selection
-            selectedContainer = null;
+            selectedBall.y = container.y + containerHeight / 2 - ball_diameter / 2 - balls[containerIndex].length * ball_diameter; 
+            balls[containerIndex].push(selectedBall); 
+            selectedBall = null; 
+            selectedContainer = null; 
+            if (gameWon()) {
+              console.log("Game won!");
+            }
             return;
           } 
           else {
-            console.log("Container is full!"); // Optional feedback
+            console.log("Container is full!"); 
           }
         }
       }
@@ -254,24 +273,44 @@ function fingerTouch() {
   }
 }
 
-function gameWon(){
+function gameWon() {
+  // Check if all containers are sorted by color
   for (let containerIndex in balls) {
     containerBalls = balls[containerIndex];
     if (containerBalls.length > 0) {
       let firstColor = containerBalls[0].colour; // Get the color of the first ball
       for (let ball of containerBalls) {
         if (ball.colour !== firstColor) {
-          if (containerBalls.length !== 3){
-            return false; // If any ball is of a different color, the game is not won
-          }
+          return false; // If any ball is of a different color, the game is not won
         }
       }
     }
   }
 
-  gameOver = true; // Set the gameOver flag to true
-  textSize(42);
-  fill(0);
-  text("You Win!", width / 2, height / 2);
-  return true; // All containers are sorted by color
+  gameOver = true;
+  displayWinScreen();
+  return true;
+}
+
+function displayWinScreen() {
+  // Display "You Win!" message 
+  gameCanvas.textSize(64);
+  gameCanvas.fill(0); // Black text
+  gameCanvas.textAlign(CENTER, CENTER);
+  gameCanvas.text("You Win!", width / 2, height / 3);
+
+  gameCanvas.textSize(24);
+  gameCanvas.fill(100);
+  gameCanvas.text("Refresh the page to play again!", width / 2, height / 3 + 50);
+
+  // Add confetti effect
+  for (let i = 0; i < 100; i++) {
+    let x = random(width); // Random x position
+    let y = random(height); // Random y position
+    let size = random(5, 15); // Random size for confetti
+    let color = color(random(255), random(255), random(255)); // Random color
+    gameCanvas.fill(color);
+    gameCanvas.noStroke();
+    gameCanvas.ellipse(x, y, size); // Draw confetti as small circles
+  }
 }
