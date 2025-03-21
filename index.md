@@ -6,6 +6,7 @@
 - [Perlin Noise](05-perlin-noise)
 - [Terrain Generation](06-terrain)
 - [Bubble Object Notation](07-bubbles)
+-[2D Array Grid](08-grid)
 
 # CS30 Projects
 - [Interactive Scene / Tower Of Hanoi](interactive-scene)
