@@ -53,15 +53,3 @@ function drawGrid(){
     }
   }
 }
-
-function mouseWheel(event){
-  if (event.delta > 0) {
-    cellSize += 5;
-  }
-  else {
-    cellSize -= 5;
-  }
-  cols = Math.floor(width/cellSize);
-  rows = Math.floor(height/cellSize);
-  generateRandomGrid();
-}
