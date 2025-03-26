@@ -1,7 +1,7 @@
 // Game of Life Demo
 
-const CELL_SIZE = 40;
-const RENDER_ON_FRAME = 1;
+const CELL_SIZE = prompt("Enter the Cell Size", 20);
+const RENDER_ON_FRAME = prompt("Enter the Speed(Lower the number, Faster It is)" ,2);
 let grid;
 let rows;
 let cols;
@@ -13,6 +13,7 @@ function preload(){
 }
 
 function setup() {
+  alert("Welcome to the game of ")
   createCanvas(windowWidth, windowHeight);
   cols = Math.ceil(width/CELL_SIZE);
   rows = Math.ceil(height/CELL_SIZE);
