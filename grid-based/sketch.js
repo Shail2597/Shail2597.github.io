@@ -1,4 +1,4 @@
-// Project Title
+// Minesweeper
 // Your Name
 // Date
 //
