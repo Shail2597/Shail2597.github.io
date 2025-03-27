@@ -13,7 +13,7 @@ function preload(){
 }
 
 function setup() {
-  alert("Welcome to the game of ")
+  alert("Welcome to the game of ");
   createCanvas(windowWidth, windowHeight);
   cols = Math.ceil(width/CELL_SIZE);
   rows = Math.ceil(height/CELL_SIZE);
