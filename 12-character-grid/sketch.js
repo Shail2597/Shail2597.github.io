@@ -27,7 +27,7 @@ function preload(){
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth * 0.8, windowHeight*0.8);
   cols = Math.floor(width/cellSize);
   rows = Math.floor(height/cellSize);
   grid = generateRandomGrid();
