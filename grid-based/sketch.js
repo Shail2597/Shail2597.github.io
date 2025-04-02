@@ -12,18 +12,11 @@ const OPEN_TILE = 0;
 const CLOSED_TILE = 1;
 const FLAGGED_TILE = 2; 
 const MINE_TILE = 3;
+let gameOver = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
   document.addEventListener("contextmenu", event => event.preventDefault()); // Prevent default context menu on right-click
-  // Make the largest square that fits
-  if (height > width) {
-    cellSize = width / SQUARE_DIMENSIONS;
-  } 
-  else {
-    cellSize = height / SQUARE_DIMENSIONS;
-  }
   resetGame();
 }
 
@@ -58,6 +51,17 @@ function displayGrid() {
         fill("red");
       }
       rect(x * cellSize, y * cellSize, cellSize, cellSize);
+      
+      // Display the number of adjacent mines if the tile is opened
+      if (topGrid[y][x] === OPEN_TILE) {
+        let adjacentMines = countAdjacentMines(x, y);
+        if (adjacentMines > 0) {
+          textSize(cellSize / 2);
+          textAlign(CENTER, CENTER);
+          fill(0);
+          text(adjacentMines, x * cellSize + cellSize / 2, y * cellSize + cellSize / 2);
+        }
+      }
     }
   }
 }
@@ -79,48 +83,106 @@ function generateRandomGrid(cols, rows) {
     newGrid.push([]);
     for (let x = 0; x < cols; x++) {
       newGrid[y].push(OPEN_TILE); // Initialize all cells as OPEN_TILE
-      if (random(100) < 20) { // Adjust the probability for mine placement
-        newGrid[y][x] = MINE_TILE; // Place a mine
-      }
     }
   }
+  
+  // Place mines randomly
+  let minesToPlace = Math.floor(cols * rows * 0.2); // Adjust the number of mines
+  while (minesToPlace > 0) {
+    let x = floor(random(cols));
+    let y = floor(random(rows));
+    if (newGrid[y][x] !== MINE_TILE) {
+      newGrid[y][x] = MINE_TILE; // Place a mine
+      minesToPlace--;
+    }
+  }
+  
   return newGrid;
 }
 
+function countAdjacentMines(x, y) {
+  let count = 0;
+  for (let j = -1; j <= 1; j++) {
+    for (let i = -1; i <= 1; i++) {
+      // Skip the current cell
+      if (i === 0 && j === 0) {
+        continue;
+      } 
+      
+      let newX = x + i;
+      let newY = y + j;
+      
+      // Check if the new coordinates are within bounds
+      if (newX >= 0 && newX < SQUARE_DIMENSIONS && newY >= 0 && newY < SQUARE_DIMENSIONS) {
+        if (mineGrid[newY][newX] === MINE_TILE) {
+          count++;
+        }
+      }
+    }
+  }
+  return count;
+}
+
 function mousePressed() {
-  if (mouseButton === LEFT) {
-    for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
-      for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
-        if (mouseX > x * cellSize && mouseX < x * cellSize + cellSize && mouseY > y * cellSize && mouseY < y * cellSize + cellSize) {
-          if (topGrid[y][x] === CLOSED_TILE) {
-            if (mineGrid[y][x] === MINE_TILE) {
-              topGrid[y][x] = MINE_TILE; // Reveal the mine
-              console.log("Game Over! You clicked on a mine.");
-            }
-            else {
-              topGrid[y][x] = OPEN_TILE;
-              // Optionally, calculate and display adjacent mines here
+  if (!gameOver){
+    if (mouseButton === LEFT) {
+      for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
+        for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
+          if (mouseX > x * cellSize && mouseX < x * cellSize + cellSize && mouseY > y * cellSize && mouseY < y * cellSize + cellSize) {
+            if (topGrid[y][x] === CLOSED_TILE) {
+              if (mineGrid[y][x] === MINE_TILE) {
+                topGrid[y][x] = MINE_TILE; // Reveal the mine
+                gameOver = true; // Set game over flag
+                for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
+                  for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
+                    if (mineGrid[y][x] === MINE_TILE) {
+                      topGrid[y][x] = MINE_TILE;
+                    }
+                  }
+                }
+                console.log("Game Over! You clicked on a mine.");
+              }
+              else {
+                topGrid[y][x] = OPEN_TILE;
+                let adjacentMines = 0;
+                for (let j = -1; j <= 1; j++) {
+                  for (let i = -1; i <= 1; i++) {
+                    if (y + j >= 0 && y + j < SQUARE_DIMENSIONS && x + i >= 0 && x + i < SQUARE_DIMENSIONS) {
+                      if (mineGrid[y + j][x + i] === MINE_TILE) {
+                        adjacentMines++;
+                      }
+                    }
+                  }
+                }
+                if (adjacentMines > 0) {
+                  textSize(cellSize / 2);
+                  textAlign(CENTER, CENTER);
+                  text(adjacentMines, x * cellSize + cellSize / 2, y * cellSize + cellSize / 2);
+                  // topGrid[y][x] = adjacentMines; // Display the number of adjacent mines
+                }
+              }
             }
           }
         }
       }
     }
-  }
-  else if (mouseButton === RIGHT) {
-    for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
-      for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
-        if (mouseX > x * cellSize && mouseX < x * cellSize + cellSize && mouseY > y * cellSize && mouseY < y * cellSize + cellSize) {
-          if (topGrid[y][x] === CLOSED_TILE) {
-            topGrid[y][x] = FLAGGED_TILE; // Flag the tile
-          }
-          else if (topGrid[y][x] === FLAGGED_TILE) {
-            topGrid[y][x] = CLOSED_TILE; // Unflag the tile
+    else if (mouseButton === RIGHT) {
+      for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
+        for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
+          if (mouseX > x * cellSize && mouseX < x * cellSize + cellSize && mouseY > y * cellSize && mouseY < y * cellSize + cellSize) {
+            if (topGrid[y][x] === CLOSED_TILE) {
+              topGrid[y][x] = FLAGGED_TILE; // Flag the tile
+            }
+            else if (topGrid[y][x] === FLAGGED_TILE) {
+              topGrid[y][x] = CLOSED_TILE; // Unflag the tile
+            }
           }
         }
       }
     }
   }
 }
+
 function resetGame() {
   if (height > width) {
     cellSize = width / SQUARE_DIMENSIONS;
