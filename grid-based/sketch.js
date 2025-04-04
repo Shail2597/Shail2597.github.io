@@ -28,6 +28,7 @@ function draw() {
 function keyPressed() {
   if (key === "r") {
     resetGame();
+    gameOver = false; // Reset game over flag
   }
 }
 
