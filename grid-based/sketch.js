@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 let cellSize;
-const SQUARE_DIMENSIONS = 7;
+const SQUARE_DIMENSIONS = 10;
 let topGrid, mineGrid;
 const OPEN_TILE = 0;
 const CLOSED_TILE = 1;
@@ -88,7 +88,7 @@ function generateRandomGrid(cols, rows) {
   }
   
   // Place mines randomly
-  let minesToPlace = Math.floor(cols * rows * 0.2); // Adjust the number of mines
+  let minesToPlace = Math.floor(cols * rows * 0.125); // Adjust the number of mines
   while (minesToPlace > 0) {
     let x = floor(random(cols));
     let y = floor(random(rows));
@@ -144,6 +144,7 @@ function mousePressed() {
                 console.log("Game Over! You clicked on a mine.");
               }
               else {
+                openEmptytiles(x, y); // Open adjacent tiles recursively
                 topGrid[y][x] = OPEN_TILE;
                 let adjacentMines = 0;
                 for (let j = -1; j <= 1; j++) {
@@ -201,3 +202,18 @@ function windowResized() {
   resetGame();
 }
 
+function openEmptytiles(x, y) {
+  for (let j = -1; j <= 1; j++) {
+    for (let i = -1; i <= 1; i++) {
+      if (y + j >= 0 && y + j < SQUARE_DIMENSIONS && x + i >= 0 && x + i < SQUARE_DIMENSIONS) {
+        if (topGrid[y + j][x + i] === CLOSED_TILE) {
+          topGrid[y + j][x + i] = OPEN_TILE;
+          let adjacentMines = countAdjacentMines(x + i, y + j);
+          if (adjacentMines === 0) {
+            openEmptytiles(x + i, y + j); // Recursively open adjacent tiles
+          }
+        }
+      }
+    }
+  }
+}
