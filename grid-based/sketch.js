@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 let cellSize;
-const SQUARE_DIMENSIONS = 10;
+const SQUARE_DIMENSIONS = prompt("Enter the number of squares per side"); // Prompt user for grid size
 let topGrid, mineGrid;
 const OPEN_TILE = 0;
 const CLOSED_TILE = 1;
@@ -15,7 +15,7 @@ const MINE_TILE = 3;
 let gameOver = false;
 
 function setup() {
-  createCanvas(windowWidth * 0.7, windowHeight*0.7);
+  createCanvas(windowHeight* 0.7, windowHeight*0.7);
   document.addEventListener("contextmenu", event => event.preventDefault()); // Prevent default context menu on right-click
   resetGame();
 }
@@ -173,50 +173,6 @@ function revealAllMines() {
   }
 }
 
-// function mousePressed() {
-//   if (!gameOver){
-//     if (mouseButton === LEFT) {
-//       for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
-//         for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
-//           if (mouseX > x * cellSize && mouseX < x * cellSize + cellSize && mouseY > y * cellSize && mouseY < y * cellSize + cellSize) {
-//             if (topGrid[y][x] === CLOSED_TILE) {
-//               if (mineGrid[y][x] === MINE_TILE) {
-//                 topGrid[y][x] = MINE_TILE; // Reveal the mine
-//                 gameOver = true; // Set game over flag
-//                 for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
-//                   for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
-//                     if (mineGrid[y][x] === MINE_TILE) {
-//                       topGrid[y][x] = MINE_TILE;
-//                     }
-//                   }
-//                 }
-//                 console.log("Game Over! You clicked on a mine.");
-//               }
-//               else {
-//                 openEmptytiles(x, y); // Open adjacent tiles recursively
-//                 topGrid[y][x] = OPEN_TILE;
-//                 let adjacentMines = 0;
-//                 for (let j = -1; j <= 1; j++) {
-//                   for (let i = -1; i <= 1; i++) {
-//                     if (y + j >= 0 && y + j < SQUARE_DIMENSIONS && x + i >= 0 && x + i < SQUARE_DIMENSIONS) {
-//                       if (mineGrid[y + j][x + i] === MINE_TILE) {
-//                         adjacentMines++;
-//                       }
-//                     }
-//                   }
-//                 }
-//                 if (adjacentMines > 0) {
-//                   displayNumber(x, y, adjacentMines); 
-//                   // topGrid[y][x] = adjacentMines; // Display the number of adjacent mines
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
 
 function resetGame() {
   if (height > width) {
@@ -234,22 +190,6 @@ function windowResized() {
   // Recalculate cell size based on new window dimensions
   resetGame();
 }
-
-// function openEmptytiles(x, y) {
-//   for (let j = -1; j <= 1; j++) {
-//     for (let i = -1; i <= 1; i++) {
-//       if (y + j >= 0 && y + j < SQUARE_DIMENSIONS && x + i >= 0 && x + i < SQUARE_DIMENSIONS) {
-//         if (topGrid[y + j][x + i] === CLOSED_TILE) {
-//           topGrid[y + j][x + i] = OPEN_TILE;
-//           let adjacentMines = countAdjacentMines(x + i, y + j);
-//           if (adjacentMines === 0) {
-//             openEmptytiles(x + i, y + j); // Recursively open adjacent tiles
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
 
 function openEmptyTiles(x, y) {
   // Use a stack to avoid deep recursion
@@ -301,3 +241,12 @@ function displayNumber(xcor, ycor, number) {
   fill(0);
   text(number, xcor * cellSize + cellSize / 2, ycor * cellSize + cellSize / 2);
 }
+
+function gameisOver() {
+  // Display game over message
+  fill(0);
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text("Game Over", width / 2, height / 2);
+}
+
