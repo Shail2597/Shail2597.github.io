@@ -13,6 +13,8 @@
 - [Character Moving In Grid](12-character-grid)
 - [Platformer Game](13-platformer)
 - [OOP Walker](14-walker)
+- [OOP Fireworks](15-fireworks)
+
 # CS30 Projects
 - [Interactive Scene  Tower Of Hanoi](interactive-scene)
 - [Array & Object Notation  Ball Sorting Game](object-notation-and-array)
