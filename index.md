@@ -14,6 +14,7 @@
 - [Platformer Game](13-platformer)
 - [OOP Walker](14-walker)
 - [OOP Fireworks](15-fireworks)
+- [Connected Nodes OOP](16-connector)
 
 # CS30 Projects
 - [Interactive Scene  Tower Of Hanoi](interactive-scene)
