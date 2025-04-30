@@ -15,6 +15,7 @@
 - [OOP Walker](14-walker)
 - [OOP Fireworks](15-fireworks)
 - [Connected Nodes OOP](16-connector)
+- [Local Storage](17-local-storage)
 
 # CS30 Projects
 - [Interactive Scene  Tower Of Hanoi](interactive-scene)
