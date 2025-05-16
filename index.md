@@ -17,6 +17,7 @@
 - [Connected Nodes OOP](16-connector)
 - [Local Storage](17-local-storage)
 - [2D - Collide](18-2d-collide)
+- [OOP Inheritance](19-inheritance)
 
 # CS30 Projects
 - [Interactive Scene  Tower Of Hanoi](interactive-scene)
