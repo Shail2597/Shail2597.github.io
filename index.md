@@ -18,6 +18,7 @@
 - [Local Storage](17-local-storage)
 - [2D - Collide](18-2d-collide)
 - [OOP Inheritance](19-inheritance)
+- [Serpinski Triangle](20-serpinski-triangle)
 
 # CS30 Projects
 - [Interactive Scene  Tower Of Hanoi](interactive-scene)
